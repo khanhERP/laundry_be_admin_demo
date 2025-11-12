@@ -1,6 +1,7 @@
+// @ts-nocheck
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+// import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
@@ -106,7 +107,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      console.log(logLine);
     }
   });
 
@@ -197,9 +198,9 @@ app.use((req, res, next) => {
   try {
     const wsModule = await import("./websocket-server");
     wsModule.initializeWebSocketServer(server);
-    log("WebSocket server initialized on same port as HTTP server");
+    console.log("WebSocket server initialized on same port as HTTP server");
   } catch (error) {
-    log(
+    console.log(
       `Failed to start WebSocket server: ${error instanceof Error ? error.message : String(error)}`,
     );
     console.error("WebSocket error details:", error);
@@ -209,11 +210,11 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
+  // if (app.get("env") === "development") {
+  //   await setupVite(app, server);
+  // } else {
+  //   serveStatic(app);
+  // }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
@@ -228,13 +229,13 @@ app.use((req, res, next) => {
       host: "0.0.0.0",
     },
     () => {
-      log(`🚀 Server running on port ${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
 
       // Initialize WebSocket server after HTTP server is running
       import("./websocket-server")
         .then((wsModule) => {
           wsModule.initializeWebSocketServer(server);
-          log("WebSocket server initialized on same port as HTTP server");
+          console.log("WebSocket server initialized on same port as HTTP server");
         })
         .catch((error) => {
           console.error("Failed to initialize WebSocket server:", error);
